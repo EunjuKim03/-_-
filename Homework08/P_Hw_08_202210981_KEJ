@@ -1,0 +1,44 @@
+#수업시간에 같이 한 예제처럼, 숫자가 여러 줄에 걸쳐서 저장되어 있는 경우,각 숫자를 읽어와서, 1) 총 숫자의 개수, 2) 주어진 숫자의 평균, 3) 주어진 숫자의 최댓값
+#4) 주어진 숫자의 최솟값, 5) 중앙값을 출력하시오.
+#main 함수 및 __name__ 구문은 있어야 함.
+def text2list(input_text):
+    nums = []
+    for line in input_text.split('\n'):
+        nums.extend([int(num) for num in line.split()])
+    return nums
+
+def average(nums):
+    total = sum(nums)
+    return total / len(nums) if nums else 0
+
+def numbers(input_text):
+    return len(text2list(input_text))
+
+def max_num(input_text):
+    nums = text2list(input_text)
+    return max(nums) if nums else None
+
+def min_num(input_text):
+    nums = text2list(input_text)
+    return min(nums) if nums else None
+
+def median(nums):
+    nums.sort()
+    mid = len(nums) // 2
+    if len(nums) % 2 == 1:
+        return nums[mid]
+    else:
+        return (nums[mid - 1] + nums[mid]) / 2
+
+def main():
+    with open("numbers1.txt") as f:
+        input_text = f.read()
+
+      print("총 숫자의 개수:", numbers(input_text))
+      print("주어진 숫자의 평균:", average(nums))
+      print("주어진 숫자의 최댓값:", max_num(input_text))
+      print("주어진 숫자의 최솟값:", min_num(input_text))
+      print("중앙값:", median(nums))
+
+if __name__ == "__main__":
+    main()
