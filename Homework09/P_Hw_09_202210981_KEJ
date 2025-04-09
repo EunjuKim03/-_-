@@ -8,7 +8,7 @@ def calorie_calculation(food_name, quantity, df_food):
     if not food_info.empty:
         calorie_per_unit = food_info['calories'].values[0]
         total_calories = calorie_per_unit * quantity
-        return total_calories
+   return total_calories
     else:
         return "해당 음식은 데이터에 없습니다."
 
