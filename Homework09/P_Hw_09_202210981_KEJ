@@ -1,0 +1,51 @@
+import pandas as pd
+from google.colab import drive
+drive.mount('/content/drive')
+
+def calorie_calculation(food_name, quantity, df_food):
+   
+    food_info = df_food[df_food['food'] == food_name]
+    if not food_info.empty:
+        calorie_per_unit = food_info['calories'].values[0]
+        total_calories = calorie_per_unit * quantity
+        return total_calories
+    else:
+        return "해당 음식은 데이터에 없습니다."
+
+
+def weather_data_analysis(df_weather):
+ 
+    df_weather['date'] = pd.to_datetime(df_weather['date'])
+    df_weather['year'] = df_weather['date'].dt.year
+    average_temperature = df_weather.groupby('year')['temperature'].mean()
+    rainy_days = df_weather[df_weather['rainfall'] >= 5].groupby('year')['rainfall'].count()
+    total_rainfall = df_weather.groupby('year')['rainfall'].sum()
+    
+    return average_temperature, rainy_days, total_rainfall
+
+
+def main():
+    # 과제(9-1) 칼로리 계산
+    df_food = pd.read_csv('/content/drive/MyDrive/demo/calorie_db (1).csv')
+    print("식품 칼로리 정보:")
+    print(df_food)
+
+    food_name = input("음식을 입력하세요: ")
+    quantity = int(input(f"{food_name}의 갯수를 입력하세요: "))
+
+    total_calories = calorie_calculation(food_name, quantity, df_food)
+    print(f"{food_name} {quantity}개에 대한 총 칼로리는 {total_calories} kcal입니다.")
+    
+    # 과제(9-2) 기상자료 분석
+    df_weather = pd.read_csv('/content/drive/MyDrive/weather(146)_2022-2022.csv')
+
+    average_temperature, rainy_days, total_rainfall = weather_data_analysis(df_weather)
+
+    print("\n기상 데이터 분석 결과:")
+    print(f"연평균 기온: \n{average_temperature}")
+    print(f"5mm 이상 강우일수: \n{rainy_days}")
+    print(f"총 강우량: \n{total_rainfall}")
+
+
+if __name__ == "__main__":
+    main()
