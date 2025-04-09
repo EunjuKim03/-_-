@@ -5,7 +5,7 @@ def text2list(input_text):
     nums = []
     for line in input_text.split('\n'):
         nums.extend([int(num) for num in line.split()])
-    return nums
+return nums
 
 def average(nums):
     total = sum(nums)
