@@ -1,0 +1,50 @@
+#과제 10
+!pip install pandas
+import pandas as pd
+import io
+import requests
+
+# ▶ 정확한 데이터 URL로 수정 (Raw URL로 변경)
+url_2022 = "https://raw.githubusercontent.com/taegon/JBNU_PPP_2024/main/hw10/weather(146)_2022-2022.csv"  
+url_all = "https://raw.githubusercontent.com/taegon/JBNU_PPP/main/datasets/weather(146)_2001-2022.csv"  
+
+def get_data_from_url(url):
+    response = requests.get(url)
+    response.raise_for_status()  
+    return io.StringIO(response.text)
+
+df_2022 = pd.read_csv(get_data_from_url(url_2022))
+df_all = pd.read_csv(get_data_from_url(url_all))
+
+df_2022['date'] = pd.to_datetime(df_2022[['year', 'month', 'day']])
+df_all['date'] = pd.to_datetime(df_all[['year', 'month', 'day']])
+
+
+# [4] 최장 연속 강우일 수
+is_rain = df_2022['rainfall'] > 0
+streaks = is_rain.astype(int).groupby((~is_rain).cumsum()).sum()
+max_streak = streaks.max()
+print(f"[4] 최장 연속 강우일 수: {max_streak}일")
+
+# [5] 강우 이벤트 중 최대 강수량
+df_2022['rain_flag'] = df_2022['rainfall'] > 0
+df_2022['event_id'] = (~df_2022['rain_flag']).cumsum()
+event_rain = df_2022[df_2022['rain_flag']].groupby('event_id')['rainfall'].sum()
+max_event_rain = event_rain.max()
+print(f"[5] 강우 이벤트 중 최대 강수량: {max_event_rain:.1f}mm")
+
+# [6] 가장 더운 날 Top 3
+top3 = df_2022.nlargest(3, 'tmax')[['date', 'tmax']]
+print(f"[6] 가장 더운 날 top 3:")
+print(top3.to_string(index=False))
+
+# [1] 여름철(6~8월) 총 강수량
+summer_rain = df_2022[df_2022['month'].isin([6,7,8])]['rainfall'].sum()
+print(f"[7] 여름철(6~8월) 총 강수량: {summer_rain:.1f}mm")
+
+# [2] 2021년과 2022년 총 강수량
+rain_2021 = df_all[df_all['year'] == 2021]['rainfall'].sum()
+rain_2022 = df_all[df_all['year'] == 2022]['rainfall'].sum()
+print(f"[8] 2021년 총 강수량: {rain_2021:.1f}mm")
+print(f"    2022년 총 강수량: {rain_2022:.1f}mm")
+
