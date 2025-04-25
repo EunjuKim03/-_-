@@ -1,0 +1,28 @@
+import pandas as pd
+
+df = pd.read_csv("weather_2001_2022.csv")
+df['date'] = pd.to_datetime(df['date'])
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+
+df['gap'] = df['tmax'] - df['tmin']
+
+# 1. 연도별 최대 일교차가 발생한 날짜와 일교차
+max_gap_by_year = df.loc[df.groupby('year')['gap'].idxmax(), ['year', 'date', 'gap']]
+print("1. 연도별 최대 일교차 일자와 일교차:")
+for _, row in max_gap_by_year.iterrows():
+    print(f"{row['date'].strftime('%Y/%m/%d')} {row['gap']:.1f}")
+
+# 2. 5월부터 9월까지 적산온도(GDD, 기준 5도 초과분)
+def gdd(temp_series, base_temp=5):
+    return temp_series.apply(lambda x: max(x - base_temp, 0))
+
+# 5~9월 필터링
+gdd_df = df[df['month'].between(5, 9)].copy()
+gdd_df['gdd'] = gdd(gdd_df['tavg'])
+
+# 연도별 적산온도 합계
+gdd_by_year = gdd_df.groupby('year')['gdd'].sum()
+print("\n2. 연도별 적산온도 (5~9월):")
+for year, gdd in gdd_by_year.items():
+    print(f"{year} {gdd:.1f}")
