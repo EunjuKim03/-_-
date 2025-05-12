@@ -1,0 +1,23 @@
+numbers = []
+
+while True:
+    user_input = input("X=? ")
+    
+    try:
+        num = int(user_input)
+    except ValueError:
+        continue 
+
+    if num == -1:
+        break  
+    elif num > 0:
+        numbers.append(num)  
+
+print("입력 받은 자연수 리스트:", numbers)
+print("총 개수:", len(numbers))
+
+if numbers:
+    average = sum(numbers) / len(numbers)
+    print("평균: {:.2f}".format(average))
+else:
+    print("평균: 0.00")
