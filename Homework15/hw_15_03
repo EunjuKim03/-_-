@@ -1,0 +1,48 @@
+import random
+from typing import List
+import unicodedata
+
+def get_initial_consonant(word: str) -> str:
+    result = []
+    for ch in word:
+        if ch.isspace():
+            continue
+        if '가' <= ch <= '힣':
+            decomp = unicodedata.normalize('NFD', ch)
+            result.append(decomp[0])
+        else:
+            result.append(ch)
+    return ''.join(result)
+
+def start_game(word_list: List[str], rounds: int = 5) -> None:
+
+    print("초성으로 과일 이름 맞추기 퀴즈")
+    score = 0
+    for idx in range(1, rounds + 1):
+        word = random.choice(word_list)
+        hint = get_initial_consonant(word)
+        print(f"[{idx}/{rounds}] 초성: {hint}")
+        answer = input("👉  ").strip()
+
+        # 공백 제거한 형태로 비교
+        canonical_word   = word.replace(" ", "")
+        canonical_answer = answer.replace(" ", "")
+
+        if not canonical_answer:
+            print("⏭ 입력이 없습니다. 패스합니다.")
+            continue
+
+        if canonical_answer == canonical_word:
+            print("🎉 정답입니다!")
+            score += 1
+        else:
+            print(f"❌ 틀렸습니다… 정답은 '{word}'였습니다.")
+
+    print(f"\n🏁 게임 종료! 최종 점수: {score}/{rounds}")
+
+if __name__ == "__main__":
+    FRUITS = [
+        "사과", "바나나", "딸기", "배", "복숭아",
+        "수박"
+    ]
+    start_game(FRUITS, rounds=5)
