@@ -1,0 +1,36 @@
+# 2. 카이사르 암호 (Caesar Cipher)
+def caesar_encode(text: str, shift: int = 3) -> str:
+    encoded_text = []
+    for ch in text:
+        if 'a' <= ch <= 'z':
+            encoded_ch = chr((ord(ch) - ord('a') + shift) % 26 + ord('a'))
+            encoded_text.append(encoded_ch)
+        elif 'A' <= ch <= 'Z':
+            encoded_ch = chr((ord(ch) - ord('A') + shift) % 26 + ord('A'))
+            encoded_text.append(encoded_ch)
+        else:
+            encoded_text.append(ch) 
+    return ''.join(encoded_text)
+
+def caesar_decode(text: str, shift: int = 3) -> str:
+    decoded_text = []
+    for ch in text:
+        if 'a' <= ch <= 'z':
+            decoded_ch = chr((ord(ch) - ord('a') - shift) % 26 + ord('a'))
+            decoded_text.append(decoded_ch)
+        elif 'A' <= ch <= 'Z':
+            decoded_ch = chr((ord(ch) - ord('A') - shift) % 26 + ord('A'))
+            decoded_text.append(decoded_ch)
+        else:
+            decoded_text.append(ch)
+    return ''.join(decoded_text)
+
+if __name__ == "__main__":
+    original_text = "Hello, World!"
+    shift_value = 3
+    encoded = caesar_encode(original_text, shift_value)
+    decoded = caesar_decode(encoded, shift_value)
+    
+    print(f"원본 텍스트: {original_text}")
+    print(f"암호화된 텍스트: {encoded}")
+    print(f"복호화된 텍스트: {decoded}")
