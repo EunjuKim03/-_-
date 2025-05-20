@@ -1,0 +1,22 @@
+import random
+
+def generate_lotto():
+  return random.sample(range(1, 46), 6)
+
+def main():
+  while True:
+    try:
+      num_iterations = int(input("몇 번할겨? "))
+      if num_iterations > 0:
+        break
+      else:
+        print("정수 입력")
+    except ValueError:
+      print("숫자 입력.")
+
+  for i in range(num_iterations):
+    lotto_numbers = generate_lotto()
+    print(f"로또 번호 {i + 1}: {sorted(lotto_numbers)}")
+
+if __name__ == "__main__":
+  main()
