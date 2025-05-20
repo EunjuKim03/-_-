@@ -1,0 +1,40 @@
+import random
+
+word_list = ['apple', 'banana', 'grape', 'melon', 'peach', 'orange']
+answer = random.choice(word_list)  
+display = ['_'] * len(answer)      
+used_letters = []                 
+trial = 7                         
+
+print("행맨 게임!")
+print("단어를 맞춰보쇼.")
+
+while trial > 0 and '_' in display:
+    print("\n현재 상태:", " ".join(display))
+    print(f"남은 기회: {trial}")
+    guess = input("답을 입력 => ").lower()
+
+    # 유효성 검사
+    if len(guess) != 1 or not guess.isalpha():
+        print("한 글자의 알파벳만 입력하세요.")
+        continue
+    if guess in used_letters:
+        print("이미 입력한 글자입니다.")
+        continue
+
+    used_letters.append(guess)
+
+    if guess in answer:
+        for i, letter in enumerate(answer):
+            if letter == guess:
+                display[i] = guess
+        print("정답입니다!")
+    else:
+        trial -= 1
+        print("틀렸습니다.")
+
+# 결과 출력
+if '_' not in display:
+    print("\n축하합니다! 단어를 맞췄습니다:", answer)
+else:
+    print("\n기회를 모두 소진했습니다. 정답은:", answer)
