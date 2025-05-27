@@ -1,0 +1,33 @@
+import PySimpleGUI as sg
+import random
+
+def generate_lotto():
+    return random.sample(range(1, 46), 6)
+
+def main():
+    while True:
+        layout = [
+            [sg.Text("몇 번 할까요?")],
+            [sg.Input(key='num')],
+            [sg.Button('확인')]
+        ]
+        window = sg.Window('로또 번호', layout)
+        event, values = window.read()
+        window.close()
+        try:
+            num_iterations = int(values['num'])
+            if num_iterations > 0:
+                break
+            else:
+                sg.popup("정수를 입력하세요.", keep_on_top=True)
+        except:
+            sg.popup("숫자를 입력하세요.", keep_on_top=True)
+
+    results = []
+    for i in range(num_iterations):
+        lotto_numbers = generate_lotto()
+        results.append(f"로또 번호 {i + 1}: {sorted(lotto_numbers)}")
+    sg.popup('\n'.join(results), title="로또 결과", keep_on_top=True)
+
+if __name__ == "__main__":
+    main()
