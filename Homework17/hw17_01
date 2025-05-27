@@ -1,0 +1,14 @@
+import PySimpleGUI as sg
+import time
+
+def countdown():
+    for i in range(5, 0, -1):
+        sg.popup_no_buttons(str(i), title='카운트다운', auto_close=True, auto_close_duration=1, keep_on_top=True)
+    sg.popup("Happy New Year!", title='카운트다운 종료', keep_on_top=True)
+
+def main():
+    sg.popup('카운트다운을 시작합니다!', keep_on_top=True)
+    countdown()
+
+if __name__ == "__main__":
+    main()
