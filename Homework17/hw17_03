@@ -1,0 +1,45 @@
+import PySimpleGUI as sg
+import random
+
+word_list = ['apple', 'banana', 'grape', 'melon', 'peach', 'orange']
+answer = random.choice(word_list)
+display = ['_'] * len(answer)
+used_letters = []
+trial = 7
+
+sg.popup('행맨 게임!', '단어를 맞춰보세요.', keep_on_top=True)
+
+while trial > 0 and '_' in display:
+    layout = [
+        [sg.Text(f"현재 상태: {' '.join(display)}")],
+        [sg.Text(f"남은 기회: {trial}")],
+        [sg.Text(f"사용한 글자: {' '.join(used_letters)}")],
+        [sg.Input(key='guess')],
+        [sg.Button('확인')]
+    ]
+    window = sg.Window('행맨', layout)
+    event, values = window.read()
+    window.close()
+    guess = values['guess'].lower() if values['guess'] else ''
+
+    if len(guess) != 1 or not guess.isalpha():
+        sg.popup("한 글자의 알파벳만 입력하세요.", keep_on_top=True)
+        continue
+    if guess in used_letters:
+        sg.popup("이미 입력한 글자입니다.", keep_on_top=True)
+        continue
+
+    used_letters.append(guess)
+    if guess in answer:
+        for i, letter in enumerate(answer):
+            if letter == guess:
+                display[i] = guess
+        sg.popup("정답입니다!", keep_on_top=True)
+    else:
+        trial -= 1
+        sg.popup("틀렸습니다.", keep_on_top=True)
+
+if '_' not in display:
+    sg.popup(f"축하합니다! 단어를 맞췄습니다: {answer}", keep_on_top=True)
+else:
+    sg.popup(f"기회를 모두 소진했습니다. 정답은: {answer}", keep_on_top=True)
