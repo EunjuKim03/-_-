@@ -1,0 +1,53 @@
+import pandas as pd
+import xml.etree.ElementTree as ET
+import subprocess
+
+SERVICE_KEY = "3cXt6pmTwA%2BO48OwkOPKCo89WRuOY9FYV0Ti3w1pRckdzp%2Bx87QN4CmUuUfEOMIil%2Fz%2BIjpp8XAZkaITt620Fw%3D%3D"
+
+def get_weather_data(station_id, year):
+    url = (
+        "https://apis.data.go.kr/1360000/AsosDalyInfoService/getWthrDataList"
+        f"?serviceKey={SERVICE_KEY}"
+        "&numOfRows=366&pageNo=1&dataType=XML&dataCd=ASOS&dateCd=DAY"
+        f"&startDt={year}0101&endDt={year}1231&stnIds={station_id}"
+    )
+    result = subprocess.run(['curl', '-k', url], capture_output=True, text=True)
+    xml_str = result.stdout
+    root = ET.fromstring(xml_str)
+    items = root.findall('.//item')
+    data = []
+    for item in items:
+        row = {
+            'tm': item.findtext('tm'),
+            'avgTa': item.findtext('avgTa'),
+            'maxTa': item.findtext('maxTa'),
+            'minTa': item.findtext('minTa'),
+            'sumRn': item.findtext('sumRn'),
+        }
+        data.append(row)
+    df = pd.DataFrame(data)
+    df['tm'] = pd.to_datetime(df['tm'])
+    df[['avgTa', 'maxTa', 'minTa', 'sumRn']] = df[['avgTa', 'maxTa', 'minTa', 'sumRn']].apply(pd.to_numeric, errors='coerce')
+    return df
+
+# 1) 전주시(146)의 2012년 연 강수량
+df_2015_146 = get_weather_data(146, 2012)
+rain_2015_146 = df_2015_146['sumRn'].sum()
+
+# 2) 전주시(146)의 2024년 최대 평균기온
+df_2022_146 = get_weather_data(146, 2024)
+max_tavg_2022_146 = df_2022_146['avgTa'].max()
+
+# 3) 전주시(146)의 2020년 최대 일교차
+df_2024_146 = get_weather_data(146, 2020)
+df_2024_146['diurnal_range'] = df_2024_146['maxTa'] - df_2024_146['minTa']
+max_diurnal_range = df_2024_146['diurnal_range'].max()
+
+# 4) 수원(119)과 전주(146)의 2019년 총 강수량 차이
+df_2024_119 = get_weather_data(119, 2019)
+rain_diff = abs(df_2024_146['sumRn'].sum() - df_2024_119['sumRn'].sum())
+
+print(f"2012 전주 강수량: {rain_2015_146}mm")
+print(f"2024 전주 최대 평균기온: {max_tavg_2022_146}℃")
+print(f"2020 전주 최대 일교차: {max_diurnal_range}℃")
+print(f"2019 전주-수원 강수량 차이: {rain_diff}mm")
