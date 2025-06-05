@@ -1,3 +1,12 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+from google.colab import drive
+drive.mount('/content/drive')
+df = pd.read_csv('/content/drive/MyDrive/김은주_빈집 논문 파일/최종데이터_김은주_20250314.csv')
+
 plt.figure(figsize=(10, 6))
 sns.scatterplot(x='totalpop', y='ta_mean', data=df)
 plt.title('Scatterplot of Total Population vs Mean Air Temperature (2019 August)')
