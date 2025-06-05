@@ -1,0 +1,12 @@
+# 시각화 (2) Histplot - 데이터의 분포를 히스토그램으로 시각화
+# 2019년 8월 최대 지표온도(lst2019_ma)의 분포를 히스토그램으로 시각화하고 커널 밀도 추정(KDE)을 추가합니다.
+
+# 히스토그램 생성
+plt.figure(figsize=(10, 6))
+sns.histplot(df['lst2019_ma'], bins=20, kde=True)
+  # bins=20: 히스토그램의 막대 수를 20개로 설정
+  # kde=True: 커널 밀도 추정(KDE)을 사용하여 히스토그램 위에 부드러운 곡선을 추가
+plt.title('Histogram of Max LST (2019 August)')
+plt.xlabel('Max Land Surface Temperature (2019 August)')
+plt.ylabel('Frequency')
+plt.show()
