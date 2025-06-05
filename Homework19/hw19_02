@@ -1,0 +1,6 @@
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='totalpop', y='ta_mean', data=df)
+plt.title('Scatterplot of Total Population vs Mean Air Temperature (2019 August)')
+plt.xlabel('Total Population')
+plt.ylabel('Mean Air Temperature (2019 August)')
+plt.show()
