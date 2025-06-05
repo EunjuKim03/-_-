@@ -1,3 +1,12 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+from google.colab import drive
+drive.mount('/content/drive')
+df = pd.read_csv('/content/drive/MyDrive/김은주_빈집 논문 파일/최종데이터_김은주_20250314.csv')
+
 # 시각화 (2) Histplot - 데이터의 분포를 히스토그램으로 시각화
 # 2019년 8월 최대 지표온도(lst2019_ma)의 분포를 히스토그램으로 시각화하고 커널 밀도 추정(KDE)을 추가합니다.
 
