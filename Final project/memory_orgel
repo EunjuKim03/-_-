@@ -1,0 +1,275 @@
+import os
+import sys
+import platform
+import tkinter as tk
+from tkinter import ttk
+import keyboard
+
+
+if platform.system() == "Windows":
+    from winsound import Beep
+    def play_sound(freq, dur):
+        Beep(freq, dur)
+else:
+    def play_sound(freq, dur):
+        print(f"[Beep: {freq}Hz for {dur}ms]")  
+
+
+NOTE_FREQS = {
+    'c': 261, 'c#': 277, 'd': 293, 'd#': 311, 'e': 329,
+    'f': 349, 'f#': 370, 'g': 392, 'g#': 415, 'a': 440,
+    'a#': 466, 'b': 493
+}
+NOTE_NAMES_KOR = {
+    'c': '도', 'c#': '도샾', 'd': '레', 'd#': '레샾', 'e': '미',
+    'f': '파', 'f#': '파샾', 'g': '솔', 'g#': '솔샾', 'a': '라',
+    'a#': '라샾', 'b': '시'
+}
+SHEET_DIR = './musicsheet'
+os.makedirs(SHEET_DIR, exist_ok=True)
+
+
+def save_initial_scores():
+    initial_scores = {
+        "학교종이 땡땡땡": [
+            ('g', 0, 1), ('g', 0, 1), ('a', 0, 1), ('a', 0, 1), ('g', 0, 1), ('g', 0, 1), ('e', 0, 2),
+            ('g', 0, 1), ('g', 0, 1), ('e', 0, 1), ('e', 0, 1), ('d', 0, 2),
+            ('g', 0, 1), ('g', 0, 1), ('a', 0, 1), ('a', 0, 1), ('g', 0, 1), ('g', 0, 1), ('e', 0, 2),
+            ('g', 0, 1), ('e', 0, 1), ('d', 0, 1), ('e', 0, 1), ('c', 0, 2)
+        ],
+        "섬집아기": [
+            ('c', 0, 1), ('f', 0, 1), ('g', 0, 1), ('a', 0, 1), ('g', 0, 1), ('f', 0, 1), ('g', 0, 2),
+            ('a', 0, 1), ('f', 0, 1), ('g', 0, 1), ('f', 0, 1), ('d', 0, 1), ('c', 0, 2),
+            ('c', 0, 1), ('f', 0, 1), ('g', 0, 1), ('a', 0, 1), ('g', 0, 1), ('f', 0, 1), ('g', 0, 2),
+            ('a', 0, 1), ('f', 0, 1), ('g', 0, 1), ('d', 0, 1), ('e', 0, 1), ('f', 0, 2)
+        ],
+        "Twinkle Twinkle": [
+            ('c', 0, 1), ('c', 0, 1), ('g', 0, 1), ('g', 0, 1), ('a', 0, 1), ('a', 0, 1), ('g', 0, 2),
+            ('f', 0, 1), ('f', 0, 1), ('e', 0, 1), ('e', 0, 1), ('d', 0, 1), ('d', 0, 1), ('c', 0, 2)
+        ]
+    }
+    for title, notes in initial_scores.items():
+        path = os.path.join(SHEET_DIR, f"{title}.txt")
+        if not os.path.exists(path):
+            with open(path, 'w', encoding='utf-8') as f:
+                for n in notes:
+                    f.write(f"{n[0]} {n[1]} {n[2]}\n")
+
+save_initial_scores()
+
+
+def esc_listener(root):
+    def check_keys():
+        if keyboard.is_pressed('esc'):
+            print("\n프로그램을 종료합니다.")
+            play_sound(440, 500)
+            root.quit() 
+            return
+        root.after(100, check_keys)  
+
+    check_keys()  
+
+
+def play_note(note, octave, beat):
+    freq = NOTE_FREQS[note] * (2 ** octave)
+    duration = int(beat * 500)
+    print(f"♪ {NOTE_NAMES_KOR[note]} ({octave}옥타브) - {duration}ms")
+    play_sound(freq, duration)
+
+# 악보 만들기
+
+def open_sheet_creator(root):
+    def close_win():
+        try:
+            win.destroy()
+        except:
+            pass
+
+    def create():
+        print("\n---------------------------")
+        print("[악보 만들기 시작]")
+        print("---------------------------")
+        print("- 음 이름: c, c#, d, d#, e, f, f#, g, g#, a, a#, b")
+        print("- 옥타브: 정수 (-2 ~ 2)")
+        print("- 박자: 실수형 (예: 1 = 500ms, 0.5 = 250ms)")
+        print("- 입력 형식: [음이름] [옥타브] [박자]")
+        print("- 's' 입력 시 종료/저장, 'q' 입력 시 취소\n")
+
+       
+        while True:
+            title = input("악보 제목을 입력하시오 ('q'로 취소): ").strip()
+            if title.lower() == 'q':
+                print("입력이 취소되었습니다.")
+                print("---------------------------")
+                print("[악보 만들기 종료]")
+                print("---------------------------")
+                close_win()
+                return
+            if not title:
+                print("제목을 입력하세요.")
+                continue
+            break
+
+        notes = []
+
+        while True:
+            entry = input(">> ").strip().lower()
+            if entry == 'q':
+                print("입력이 취소되었습니다.")
+                print("---------------------------")
+                print("[악보 만들기 종료]")
+                print("---------------------------")
+                close_win()
+                return
+            if entry == 's':
+                confirm = input("저장하시겠습니까? (y/n): ").strip().lower()
+                if confirm == 'y':
+                    path = os.path.join(SHEET_DIR, f"{title}.txt")
+                    with open(path, 'w', encoding='utf-8') as f:
+                        for n in notes:
+                            f.write(' '.join(map(str, n)) + '\n')
+                    print("저장되었습니다.")
+                    print("---------------------------")
+                    print("[악보 만들기 종료]")
+                    print("---------------------------")
+                    close_win()
+                    return
+                else:
+                    print("악보를 다시 입력합니다.\n")
+                    notes = []
+                    continue
+
+            parts = entry.split()
+            if len(parts) != 3:
+                print("입력 형식 오류: [음이름] [옥타브] [박자]")
+                continue
+
+            note, octv, beat = parts
+            if note not in NOTE_FREQS:
+                print("잘못된 음 이름입니다.")
+                continue
+
+            try:
+                octv = int(octv)
+                if not -2 <= octv <= 2:
+                    raise ValueError()
+            except:
+                print("옥타브는 -2 ~ 2의 정수여야 합니다.")
+                continue
+
+            try:
+                beat = float(beat)
+                if beat <= 0:
+                    raise ValueError()
+            except:
+                print("박자는 0보다 커야 합니다.")
+                continue
+
+            notes.append((note, octv, beat))
+
+    win = tk.Toplevel(root)
+    win.title("악보 만들기")
+    tk.Label(win, text=(
+        "[악보 만들기 규칙]\n"
+        "- 음 이름: c, c#, d, d#, e, f, f#, g, g#, a, a#, b\n"
+        "- 옥타브: -2 ~ 2\n"
+        "- 박자: 실수형 (1 = 500ms, 0.5 = 250ms)\n"
+        "- 입력 형식: [음이름] [옥타브] [박자]\n"
+        "- 's' 입력 시 저장 여부 확인\n"
+        "- 'q' 입력 시 악보 만들기 취소"
+    ), justify="left").pack(padx=20, pady=20)
+
+    create()
+
+# 악보 재생
+def open_sheet_player(root):
+    def play_selected():
+        name = combo.get()
+        if not name:
+            return
+        print("\n---------------------------")
+        print(f"[악보 재생: {name.replace('.txt','')}]")
+        print("---------------------------")
+        path = os.path.join(SHEET_DIR, name)
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                try:
+                    note, octv, beat = line.strip().split()
+                    play_note(note, int(octv), float(beat))
+                except:
+                    print(f"⚠️ 잘못된 줄 건너뜀: {line.strip()}")
+        print("---------------------------")
+        print("[재생 종료]")
+        print("---------------------------")
+
+    win = tk.Toplevel(root)
+    win.title("악보 재생")
+    tk.Label(win, text=(
+        "[악보 재생 규칙]\n"
+        "- 리스트에서 악보를 선택 후 재생 버튼 클릭\n"
+        "- 콘솔에 ♪ 음표와 재생 정보 출력\n"
+        "- 음 길이: 박자 × 500ms"
+    ), justify="left").pack(pady=10)
+
+    files = [f for f in os.listdir(SHEET_DIR) if f.endswith('.txt')]
+    combo = ttk.Combobox(win, values=files, state="readonly")
+    combo.pack(pady=10)
+
+    tk.Button(win, text="재생", command=play_selected).pack(pady=10)
+
+
+# 실시간 연주
+def open_live_player(root):
+    def check_keys():
+        key_map = {
+            '1': ('c', 0), '2': ('d', 0), '3': ('e', 0), '4': ('f', 0),
+            '5': ('g', 0), '6': ('a', 0), '7': ('b', 0), '8': ('c', 1)
+        }
+        for key in key_map:
+            if keyboard.is_pressed(key):
+                note, octv = key_map[key]
+                play_note(note, octv, 1)
+        if keyboard.is_pressed('esc') or keyboard.is_pressed('q'):
+            print("---------------------------")
+            print("[실시간 연주 종료]")
+            print("---------------------------")
+            try:
+                win.destroy()
+            except:
+                pass
+            return
+        win.after(100, check_keys)
+
+    win = tk.Toplevel(root)
+    win.title("실시간 연주")
+    tk.Label(win, text=(
+        "[실시간 연주 규칙]\n"
+        "- 키보드 1~8 입력 시 음 재생\n"
+        "- 1~7: 도~시 (0옥타브), 8: 도(1옥타브)\n"
+        "- 'q' 또는 ESC 누르면 종료"
+    ), justify="left").pack(padx=20, pady=20)
+    print("---------------------------")
+    print("[실시간 연주 시작]")
+    print("'q' 입력 시 종료")
+    print("---------------------------")
+    win.after(100, check_keys)
+
+
+def run_gui():
+    root = tk.Tk()
+    root.title("추억의 오르골")
+
+    tk.Label(root, text="기능을 선택하세요", font=("Arial", 14)).pack(pady=10)
+
+    tk.Button(root, text="1. 악보 만들기", width=30, command=lambda: open_sheet_creator(root)).pack(pady=5)
+    tk.Button(root, text="2. 악보 재생하기", width=30, command=lambda: open_sheet_player(root)).pack(pady=5)
+    tk.Button(root, text="3. 실시간 연주", width=30, command=lambda: open_live_player(root)).pack(pady=5)
+
+    tk.Label(root, text="ESC 키나 q를 누르면 언제든지 종료됩니다", fg="gray").pack(pady=10)
+
+    esc_listener(root)  
+    root.mainloop()
+
+if __name__ == '__main__':
+    run_gui()
+
